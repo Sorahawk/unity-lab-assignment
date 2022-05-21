@@ -4,35 +4,30 @@ using UnityEngine;
 
 
 public class EnemyController : MonoBehaviour {
-    private float originalX;
-    private float maxOffset = 6.0f;
-    private float enemyPatrolTime = 2.0f;
-    private int moveRight = -1;
+    private Rigidbody2D enemyBody;
     private Vector2 velocity;
 
-    private Rigidbody2D enemyBody;
+    private int moveRight = 1;
+    private float speed = 30;
+    private float maxSpeed = 100;
 
     void Start() {
         enemyBody = GetComponent<Rigidbody2D>();
-        originalX = transform.position.x;
-        ComputeVelocity();        
     }
 
-    void Update() {
-        if (Mathf.Abs(enemyBody.position.x - originalX) < maxOffset) {
-            MoveGomba();
-        } else {
-            moveRight *= -1;
-            ComputeVelocity();
-            MoveGomba();
+    void FixedUpdate() {
+        velocity = new Vector2(moveRight * speed, 0);
+
+        if (enemyBody.velocity.magnitude < maxSpeed) {
+            enemyBody.AddForce(velocity);
         }
     }
 
-    void ComputeVelocity() {
-        velocity = new Vector2(moveRight * maxOffset / enemyPatrolTime, 0);
-    }
-
-    void MoveGomba() {
-        enemyBody.MovePosition(enemyBody.position + velocity * Time.fixedDeltaTime);
+    void OnCollisionEnter2D(Collision2D col) {
+        if (col.gameObject.CompareTag("Left Wall")) {
+            moveRight = 1;
+        } else if (col.gameObject.CompareTag("Right Wall")) {
+            moveRight = -1;
+        }
     }
 }

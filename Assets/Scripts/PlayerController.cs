@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
     private Rigidbody2D marioBody;
     private SpriteRenderer marioSprite;
+    private Vector2 velocity;
 
     private float speed = 100;
     private float maxSpeed = 150;
@@ -13,7 +14,6 @@ public class PlayerController : MonoBehaviour {
 
     private float friction = 0.15f;
     private float airDrag = 0.1f;
-    private Vector2 currentVelocity;
 
     private bool onGround = true;
     private bool onLeftWall = false;
@@ -36,14 +36,16 @@ public class PlayerController : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        currentVelocity = marioBody.velocity;
+        // manually calculate horizontal drag, with different values on ground and in air
+        velocity = marioBody.velocity;
         
-        if (onGround) currentVelocity.x *= (1 - friction);
-        else currentVelocity.x *= (1 - airDrag);
+        if (onGround) velocity.x *= (1 - friction);
+        else velocity.x *= (1 - airDrag);
 
-        marioBody.velocity = currentVelocity;
+        marioBody.velocity = velocity;
 
 
+        // move character
         float moveHorizontal = Input.GetAxis("Horizontal");
 
         if (Mathf.Abs(moveHorizontal) > 0) {
@@ -54,6 +56,7 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
+        // deal with jumping on ground and from walls
         if (onLeftWall) {
             if (Input.GetKeyDown("space")) {
                 marioBody.velocity = new Vector2(3, upSpeed);

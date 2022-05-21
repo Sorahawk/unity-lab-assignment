@@ -399,7 +399,7 @@ GameObject:
   - component: {fileID: 335299596}
   m_Layer: 0
   m_Name: Mario
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1010,6 +1010,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 27717566139488928, guid: 25fa9fd701727d44b81c1dca3b040bd3, type: 3}
+      propertyPath: m_Constraints
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 2273094322552002157, guid: 25fa9fd701727d44b81c1dca3b040bd3, type: 3}
       propertyPath: m_Name
       value: Enemy
