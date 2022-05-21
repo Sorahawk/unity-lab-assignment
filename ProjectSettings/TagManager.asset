@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Ground
+  - Enemy
+  - Ceiling
+  - Left Wall
+  - Right Wall
   layers:
   - Default
   - TransparentFX
