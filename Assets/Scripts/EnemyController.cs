@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour {
     private Rigidbody2D enemyBody;
+    private SpriteRenderer enemySprite;
     private Vector2 velocity;
 
     private int moveRight = 1;
@@ -13,6 +14,7 @@ public class EnemyController : MonoBehaviour {
 
     void Start() {
         enemyBody = GetComponent<Rigidbody2D>();
+        enemySprite = GetComponent<SpriteRenderer>();
     }
 
     void FixedUpdate() {
@@ -26,8 +28,10 @@ public class EnemyController : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D col) {
         if (col.gameObject.CompareTag("Left Wall")) {
             moveRight = 1;
+            enemySprite.flipX = false;
         } else if (col.gameObject.CompareTag("Right Wall")) {
             moveRight = -1;
+            enemySprite.flipX = true;
         }
     }
 }

@@ -35,11 +35,11 @@ public class PlayerController : MonoBehaviour {
     private int highScore;
 
     // audio
-    public AudioSource gameMusic;
-    public AudioSource jumpAudio;
-    public AudioSource coinAudio;
-    public AudioSource gameOverAudio;
-    public AudioSource winAudio;
+    private AudioSource gameMusic;
+    private AudioSource jumpAudio;
+    private AudioSource coinAudio;
+    private AudioSource gameOverAudio;
+    private AudioSource winAudio;
 
     void Start() {
         Application.targetFrameRate = 60;
@@ -49,8 +49,6 @@ public class PlayerController : MonoBehaviour {
         // retrieve high score from player preferences
         highScore = PlayerPrefs.GetInt("highScore");
         Debug.Log("High Score: " + highScore.ToString());
-
-        platform = GameObject.Find("Brick");
 
         gameMusic = GameObject.Find("Music").GetComponent<AudioSource>();
         jumpAudio = GameObject.Find("Jump Audio").GetComponent<AudioSource>();
@@ -104,7 +102,7 @@ public class PlayerController : MonoBehaviour {
                 jumpAudio.Play();
 
                 // jump up-right
-                marioBody.velocity = new Vector2(10, upSpeed);
+                marioBody.velocity = new Vector2(2, upSpeed);
 
                 // set variables
                 onLeftWall = false;
@@ -123,7 +121,7 @@ public class PlayerController : MonoBehaviour {
                 jumpAudio.Play();
 
                 // jump up-left
-                marioBody.velocity = new Vector2(-10, upSpeed);
+                marioBody.velocity = new Vector2(-2, upSpeed);
 
                 // set variables
                 onRightWall = false;
@@ -166,13 +164,15 @@ public class PlayerController : MonoBehaviour {
             gameOver = true;
 
             // slow down end screen
-            Time.timeScale = 0.15f;
+            Time.timeScale = 0.2f;
 
             // check direction of collision
             float collisionDirection = (col.gameObject.transform.position.y - transform.position.y);
 
+            Debug.Log("Collision Value: " + collisionDirection.ToString());
+
             // sideways hit should be about -0.505, stomping on it gave values like -1.21 and -1.46
-            if (collisionDirection > -0.6f) {
+            if (collisionDirection > -1) {
                 // player loses, blast Mario off after switching off collisions
                 GetComponent<BoxCollider2D>().enabled = false;
                 marioBody.velocity = new Vector2(0, 50);
@@ -185,7 +185,7 @@ public class PlayerController : MonoBehaviour {
             // player wins
             else {
                 // switch off collision and shoot Gomba into the sky
-                col.gameObject.GetComponent<CircleCollider2D>().enabled = false;
+                col.gameObject.GetComponent<Collider2D>().enabled = false;
                 col.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(30, 10);
 
                 // stop music and play win sound effect

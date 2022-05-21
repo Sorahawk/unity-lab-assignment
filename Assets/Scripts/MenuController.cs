@@ -5,14 +5,8 @@ using UnityEngine.SceneManagement;
 
 
 public class MenuController : MonoBehaviour {
-    public AudioSource gameMusic;
-
     void Awake() {
         Time.timeScale = 0.0f;
-
-        // start music
-        gameMusic = GameObject.Find("Music").GetComponent<AudioSource>();
-        gameMusic.Play();
     }
 
     public void StartButtonClicked() {
