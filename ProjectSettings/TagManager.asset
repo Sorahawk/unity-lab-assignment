@@ -9,6 +9,7 @@ TagManager:
   - Ceiling
   - Left Wall
   - Right Wall
+  - Coin
   layers:
   - Default
   - TransparentFX

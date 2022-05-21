@@ -8,7 +8,7 @@ public class EnemyController : MonoBehaviour {
     private Vector2 velocity;
 
     private int moveRight = 1;
-    private float speed = 30;
+    private float speed = 20;
     private float maxSpeed = 100;
 
     void Start() {
