@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour {
     public Transform enemyLocation;
     public TMP_Text scoreText;
     public TMP_Text highScoreText;
+    public TMP_Text resultText;
     public Button restartButton;
     private bool countScoreState = false;
     private bool gameOver = false;
@@ -35,11 +36,11 @@ public class PlayerController : MonoBehaviour {
     private int highScore;
 
     // audio
-    private AudioSource gameMusic;
-    private AudioSource jumpAudio;
-    private AudioSource coinAudio;
-    private AudioSource gameOverAudio;
-    private AudioSource winAudio;
+    public AudioSource gameMusic;
+    public AudioSource jumpAudio;
+    public AudioSource coinAudio;
+    public AudioSource loseAudio;
+    public AudioSource winAudio;
 
     void Start() {
         Application.targetFrameRate = 60;
@@ -49,12 +50,6 @@ public class PlayerController : MonoBehaviour {
         // retrieve high score from player preferences
         highScore = PlayerPrefs.GetInt("highScore");
         Debug.Log("High Score: " + highScore.ToString());
-
-        gameMusic = GameObject.Find("Music").GetComponent<AudioSource>();
-        jumpAudio = GameObject.Find("Jump Audio").GetComponent<AudioSource>();
-        coinAudio = GameObject.Find("Coin Audio").GetComponent<AudioSource>();
-        gameOverAudio = GameObject.Find("Game Over Audio").GetComponent<AudioSource>();
-        winAudio = GameObject.Find("Win Audio").GetComponent<AudioSource>();
     }
 
     void Update() {
@@ -164,7 +159,7 @@ public class PlayerController : MonoBehaviour {
             gameOver = true;
 
             // slow down end screen
-            Time.timeScale = 0.2f;
+            Time.timeScale = 0.1f;
 
             // check direction of collision
             float collisionDirection = (col.gameObject.transform.position.y - transform.position.y);
@@ -172,19 +167,21 @@ public class PlayerController : MonoBehaviour {
             Debug.Log("Collision Value: " + collisionDirection.ToString());
 
             // sideways hit should be about -0.505, stomping on it gave values like -1.21 and -1.46
-            if (collisionDirection > -1) {
+            if (collisionDirection > -1.15f) {
                 // player loses, blast Mario off after switching off collisions
                 GetComponent<BoxCollider2D>().enabled = false;
                 marioBody.velocity = new Vector2(0, 50);
 
                 // stop music and play game over sound effect
                 gameMusic.Stop();
-                gameOverAudio.Play();
+                loseAudio.Play();
+
+                resultText.text = "You Lose!";
             }
 
             // player wins
             else {
-                // switch off collision and shoot Gomba into the sky
+                // switch off collision and shoot enemy into the sky
                 col.gameObject.GetComponent<Collider2D>().enabled = false;
                 col.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(30, 10);
 
@@ -202,12 +199,15 @@ public class PlayerController : MonoBehaviour {
 
                 PlayerPrefs.SetInt("highScore", highScore);
                 PlayerPrefs.Save();
-
-                highScoreText.gameObject.SetActive(true);
+            } else {
+                highScoreText.text = "High Score: " + highScore.ToString();
             }
 
-            // show high score text and reveal restart button
-            scoreText.text = "High Score: " + highScore.ToString();
+            // display results and reveal start button
+            scoreText.text = "Your Score: " + score.ToString();
+
+            resultText.gameObject.SetActive(true);
+            highScoreText.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
         }
     }
