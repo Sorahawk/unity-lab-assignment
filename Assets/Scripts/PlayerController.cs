@@ -41,6 +41,7 @@ public class PlayerController : MonoBehaviour {
     public AudioSource coinAudio;
     public AudioSource loseAudio;
     public AudioSource winAudio;
+    public AudioSource highScoreAudio;
 
     void Start() {
         Application.targetFrameRate = 60;
@@ -157,6 +158,7 @@ public class PlayerController : MonoBehaviour {
 
         else if (col.gameObject.CompareTag("Enemy")) {
             gameOver = true;
+            gameMusic.Stop();
 
             // slow down end screen
             Time.timeScale = 0.1f;
@@ -172,8 +174,7 @@ public class PlayerController : MonoBehaviour {
                 GetComponent<BoxCollider2D>().enabled = false;
                 marioBody.velocity = new Vector2(0, 50);
 
-                // stop music and play game over sound effect
-                gameMusic.Stop();
+                // play game lost sound effect
                 loseAudio.Play();
 
                 resultText.text = "You Lose!";
@@ -185,8 +186,7 @@ public class PlayerController : MonoBehaviour {
                 col.gameObject.GetComponent<Collider2D>().enabled = false;
                 col.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(30, 10);
 
-                // stop music and play win sound effect
-                gameMusic.Stop();
+                // play normal win music
                 winAudio.Play();
 
                 // add bonus points
@@ -199,8 +199,15 @@ public class PlayerController : MonoBehaviour {
 
                 PlayerPrefs.SetInt("highScore", highScore);
                 PlayerPrefs.Save();
+
+                // play high score music
+                loseAudio.Stop();
+                winAudio.Stop();
+                highScoreAudio.Play();
             } else {
+                highScoreText.fontSize = 46;
                 highScoreText.text = "High Score: " + highScore.ToString();
+
             }
 
             // display results and reveal start button
