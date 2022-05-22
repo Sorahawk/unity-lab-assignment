@@ -204,7 +204,7 @@ public class PlayerController : MonoBehaviour {
             }
 
             // display results and reveal start button
-            scoreText.text = "Your Score: " + score.ToString();
+            scoreText.text = "Score: " + score.ToString();
 
             resultText.gameObject.SetActive(true);
             highScoreText.gameObject.SetActive(true);
