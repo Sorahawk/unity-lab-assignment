@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 
 public class PlayerController : MonoBehaviour {
@@ -13,22 +12,21 @@ public class PlayerController : MonoBehaviour {
     // movement
     private float speed = 100;
     private float maxSpeed = 150;
-    private float upSpeed = 15;
+    private float upSpeed = 13;
 
     private float friction = 0.15f;
     private float airDrag = 0.1f;
 
     // collision
     public GameObject platform;
-    private bool onGround = true;
-    private bool onLeftWall = false;
-    private bool onRightWall = false;
+    public bool onGround = true;
+    public int onSideWalls = 0;
 
     // score
     public Transform enemyLocation;
-    public TMP_Text scoreText;
-    public TMP_Text highScoreText;
-    public TMP_Text resultText;
+    public Text scoreText;
+    public Text highScoreText;
+    public Text resultText;
     public Button restartButton;
     private bool countScoreState = false;
     private bool gameOver = false;
@@ -73,12 +71,9 @@ public class PlayerController : MonoBehaviour {
     void FixedUpdate() {
         // manually calculate horizontal drag, with different values on ground and in air
         velocity = marioBody.velocity;
-        
         if (onGround) velocity.x *= (1 - friction);
         else velocity.x *= (1 - airDrag);
-
         marioBody.velocity = velocity;
-
 
         // character movement handling
         float moveHorizontal = Input.GetAxis("Horizontal");
@@ -91,58 +86,23 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
-        // wall jumping
-        if (onLeftWall) {
-            if (Input.GetKeyDown("space")) {
-                // sound effects
-                jumpAudio.Play();
-
-                // jump up-right
-                marioBody.velocity = new Vector2(2, upSpeed);
-
-                // set variables
-                onLeftWall = false;
-                onGround = false;
-                countScoreState = true;
+        if (Input.GetKeyDown("space") && (onGround || onSideWalls != 0)) {
+            // wall jumping
+            if (onSideWalls != 0) {
+                // move character and play sound effect
+                marioBody.velocity = new Vector2(onSideWalls * 3, upSpeed);
             }
 
-            else if (Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
-                onLeftWall = false;
-            }
-        }
-
-        else if (onRightWall) {
-            if (Input.GetKeyDown("space")) {
-                // sound effects
-                jumpAudio.Play();
-
-                // jump up-left
-                marioBody.velocity = new Vector2(-2, upSpeed);
-
-                // set variables
-                onRightWall = false;
-                onGround = false;
-                countScoreState = true;
-            }
-
-            else if (Input.GetKeyDown("left") || Input.GetKeyDown("a")) {
-                onRightWall = false;
-            }
-        }
-
-        // jump from ground
-        else if (onGround) {
-            if (Input.GetKeyDown("space")) {
-                // sound effects
-                jumpAudio.Play();
-
-                // normal jump
+            // normal jumping
+            else if (onGround) {
+                // move character and play sound effect
                 marioBody.AddForce(Vector2.up * upSpeed, ForceMode2D.Impulse);
-
-                // set variables
-                onGround = false;
-                countScoreState = true;
             }
+
+            jumpAudio.Play();
+            countScoreState = true;
+            onGround = false;
+            onSideWalls = 0;
         }
     }
 
@@ -153,8 +113,8 @@ public class PlayerController : MonoBehaviour {
             scoreText.text = "Score: " + score.ToString();
         }
 
-        else if (col.gameObject.CompareTag("Left Wall")) onLeftWall = true;
-        else if (col.gameObject.CompareTag("Right Wall")) onRightWall = true;
+        else if (col.gameObject.CompareTag("Left Wall")) onSideWalls = 1;
+        else if (col.gameObject.CompareTag("Right Wall")) onSideWalls = -1;
 
         else if (col.gameObject.CompareTag("Enemy")) {
             gameOver = true;
@@ -164,12 +124,12 @@ public class PlayerController : MonoBehaviour {
             Time.timeScale = 0.1f;
 
             // check direction of collision
-            float collisionDirection = (col.gameObject.transform.position.y - transform.position.y);
+            float collisionDirection = transform.position.y - col.gameObject.transform.position.y;
 
             Debug.Log("Collision Value: " + collisionDirection.ToString());
 
             // sideways hit should be about -0.505, stomping on it gave values like -1.21 and -1.46
-            if (collisionDirection > -1.15f) {
+            if (collisionDirection < 0.8f) {
                 // player loses, blast Mario off after switching off collisions
                 GetComponent<BoxCollider2D>().enabled = false;
                 marioBody.velocity = new Vector2(0, 50);
@@ -217,6 +177,16 @@ public class PlayerController : MonoBehaviour {
             highScoreText.gameObject.SetActive(true);
             restartButton.gameObject.SetActive(true);
         }
+    }
+
+    void OnCollisionStay2D(Collision2D col) {
+        if (col.gameObject.CompareTag("Left Wall")) onSideWalls = 1;
+        else if (col.gameObject.CompareTag("Right Wall")) onSideWalls = -1;
+    }
+
+    void OnCollisionExit2D(Collision2D col) {
+        if (col.gameObject.CompareTag("Ground")) onGround = false;
+        else if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Right Wall")) onSideWalls = 0;
     }
 
     void OnTriggerEnter2D(Collider2D other) {
