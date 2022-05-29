@@ -7,9 +7,10 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour {
     private Rigidbody2D marioBody;
     private SpriteRenderer marioSprite;
-    private Vector2 velocity;
+    private Animator marioAnimator;
 
     // movement
+    private Vector2 velocity;
     private float speed = 100;
     private float maxSpeed = 150;
     private float upSpeed = 13;
@@ -43,8 +44,10 @@ public class PlayerController : MonoBehaviour {
 
     void Start() {
         Application.targetFrameRate = 60;
+
         marioBody = GetComponent<Rigidbody2D>();
         marioSprite = GetComponent<SpriteRenderer>();
+        marioAnimator = GetComponent<Animator>();
 
         // retrieve high score from player preferences
         highScore = PlayerPrefs.GetInt("highScore");
@@ -52,11 +55,19 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
+        marioAnimator.SetFloat("xSpeed", Mathf.Abs(marioBody.velocity.x));
+
         // flip Mario orientation according to direction of movement
         if (Input.GetKeyDown("left") || Input.GetKeyDown("a")) {
             marioSprite.flipX = true;
-        } else if (Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
+
+            if (Mathf.Abs(marioBody.velocity.x) > 1) marioAnimator.SetTrigger("onSkid");
+        }
+
+        else if (Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
             marioSprite.flipX = false;
+
+            if (Mathf.Abs(marioBody.velocity.x) > 1) marioAnimator.SetTrigger("onSkid");
         }
 
         // score counting
@@ -100,21 +111,36 @@ public class PlayerController : MonoBehaviour {
             }
 
             jumpAudio.Play();
+
             countScoreState = true;
-            onGround = false;
             onSideWalls = 0;
+            marioAnimator.SetBool("onWall", false);
+
+            onGround = false;
+            marioAnimator.SetBool("onGround", onGround);
         }
     }
 
     void OnCollisionEnter2D(Collision2D col) {
         if (col.gameObject.CompareTag("Ground") && !gameOver) {
             onGround = true;
+            marioAnimator.SetBool("onGround", onGround);
+
             countScoreState = false;
             scoreText.text = "Score: " + score.ToString();
         }
 
-        else if (col.gameObject.CompareTag("Left Wall")) onSideWalls = 1;
-        else if (col.gameObject.CompareTag("Right Wall")) onSideWalls = -1;
+        else if (col.gameObject.CompareTag("Left Wall")) {
+            onSideWalls = 1;
+            marioAnimator.SetBool("onWall", true);
+            marioSprite.flipX = false;
+        }
+
+        else if (col.gameObject.CompareTag("Right Wall")) {
+            onSideWalls = -1;
+            marioAnimator.SetBool("onWall", true);
+            marioSprite.flipX = true;
+        }
 
         else if (col.gameObject.CompareTag("Enemy")) {
             gameOver = true;
@@ -180,13 +206,27 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnCollisionStay2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Left Wall")) onSideWalls = 1;
-        else if (col.gameObject.CompareTag("Right Wall")) onSideWalls = -1;
+        if (col.gameObject.CompareTag("Left Wall")) {
+            onSideWalls = 1;
+            marioAnimator.SetBool("onWall", true);
+        }
+
+        else if (col.gameObject.CompareTag("Right Wall")) {
+            onSideWalls = -1;
+            marioAnimator.SetBool("onWall", true);
+        }
     }
 
     void OnCollisionExit2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Ground")) onGround = false;
-        else if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Right Wall")) onSideWalls = 0;
+        if (col.gameObject.CompareTag("Ground")) {
+            onGround = false;
+            marioAnimator.SetBool("onGround", onGround);
+        }
+
+        else if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Right Wall")) {
+            onSideWalls = 0;
+            marioAnimator.SetBool("onWall", false);
+        }
     }
 
     void OnTriggerEnter2D(Collider2D other) {
