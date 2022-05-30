@@ -34,9 +34,7 @@ public class EnemyController : MonoBehaviour {
     void OnCollisionEnter2D(Collision2D col) {
         // one-third chance of jumping upon each collision
         isJump = Random.Range(1, 4);
-        if (isJump != 1) {
-            isJump = 0;
-        }
+        if (isJump != 1) isJump = 0;
 
         if (col.gameObject.CompareTag("Left Wall")) {
             moveRight = 1;

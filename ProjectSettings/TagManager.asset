@@ -10,15 +10,16 @@ TagManager:
   - Left Wall
   - Right Wall
   - Coin
+  - Mushroom
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - QuestionBox
   - Water
   - UI
-  - 
-  - 
+  - Obstacles
+  - Spawned
   - 
   - 
   - 
