@@ -7,7 +7,7 @@ public class ConsumableMushroomController : MonoBehaviour {
     private Rigidbody2D mushroomBody;
     private Vector2 velocity;
     private int speed = 10;
-    private int springSpeed = 7;
+    private int springSpeed = 10;
     private bool moveRight;
     private bool stop = false;
 
@@ -31,7 +31,7 @@ public class ConsumableMushroomController : MonoBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Pillars")) {
+        if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Right Wall") || col.gameObject.CompareTag("Pillars")) {
             moveRight = !moveRight;
         }
 
