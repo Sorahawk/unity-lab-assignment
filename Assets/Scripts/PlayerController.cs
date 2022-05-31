@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Ground") && !gameOver) {
+        if ((col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Pillars")) && !gameOver) {
             onGround = true;
             marioAnimator.SetBool("onGround", onGround);
 
@@ -206,7 +206,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnCollisionStay2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Left Wall")) {
+        if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Pillars")) {
+            onGround = true;
+            marioAnimator.SetBool("onGround", onGround);
+        }
+
+        else if (col.gameObject.CompareTag("Left Wall")) {
             onSideWalls = 1;
             marioAnimator.SetBool("onWall", true);
         }
@@ -218,7 +223,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnCollisionExit2D(Collision2D col) {
-        if (col.gameObject.CompareTag("Ground")) {
+        if (col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Pillars")) {
             onGround = false;
             marioAnimator.SetBool("onGround", onGround);
         }

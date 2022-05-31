@@ -11,6 +11,7 @@ TagManager:
   - Right Wall
   - Coin
   - Mushroom
+  - Pillars
   layers:
   - Default
   - TransparentFX

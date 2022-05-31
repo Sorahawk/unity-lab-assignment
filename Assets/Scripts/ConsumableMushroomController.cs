@@ -31,11 +31,16 @@ public class ConsumableMushroomController : MonoBehaviour {
     }
 
     void OnCollisionEnter2D(Collision2D col) {
-        moveRight = !moveRight;
-
-        if (col.gameObject.CompareTag("Player")) {
-            stop = true;
-            mushroomBody.velocity = Vector2.zero;
+        if (col.gameObject.CompareTag("Left Wall") || col.gameObject.CompareTag("Pillars")) {
+            moveRight = !moveRight;
         }
+
+        else if (col.gameObject.CompareTag("Player")) {
+            gameObject.SetActive(false);
+        }
+    }
+
+    void OnBecameInvisible() {
+        Destroy(gameObject);
     }
 }

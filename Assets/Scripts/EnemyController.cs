@@ -39,7 +39,7 @@ public class EnemyController : MonoBehaviour {
         if (col.gameObject.CompareTag("Left Wall")) {
             moveRight = 1;
             enemySprite.flipX = false;
-        } else if (col.gameObject.CompareTag("Right Wall")) {
+        } else if (col.gameObject.CompareTag("Pillars")) {
             moveRight = -1;
             enemySprite.flipX = true;
         }
