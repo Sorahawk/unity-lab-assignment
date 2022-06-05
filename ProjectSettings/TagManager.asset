@@ -12,6 +12,7 @@ TagManager:
   - Coin
   - Mushroom
   - Pillars
+  - Fire
   layers:
   - Default
   - TransparentFX

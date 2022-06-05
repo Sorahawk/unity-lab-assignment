@@ -42,6 +42,9 @@ public class PlayerController : MonoBehaviour {
     public AudioSource winAudio;
     public AudioSource highScoreAudio;
 
+    // particles
+    public ParticleSystem dustCloud;
+
     void Start() {
         Application.targetFrameRate = 60;
 
@@ -123,9 +126,12 @@ public class PlayerController : MonoBehaviour {
 
     void OnCollisionEnter2D(Collision2D col) {
         if ((col.gameObject.CompareTag("Ground") || col.gameObject.CompareTag("Pillars")) && !gameOver) {
-            onGround = true;
-            marioAnimator.SetBool("onGround", onGround);
+            if (!onGround) {
+                onGround = true;
+                dustCloud.Play();
+            }
 
+            marioAnimator.SetBool("onGround", onGround);
             countScoreState = false;
             scoreText.text = "Score: " + score.ToString();
         }
@@ -246,6 +252,21 @@ public class PlayerController : MonoBehaviour {
             // remove coin and platform
             other.gameObject.SetActive(false);
             platform.gameObject.SetActive(false);
+        } else if (other.gameObject.CompareTag("Fire")) {
+            gameOver = true;
+            gameMusic.Stop();
+
+            // slow down end screen
+            Time.timeScale = 0.1f;
+
+            // player loses, blast Mario off after switching off collisions
+            GetComponent<BoxCollider2D>().enabled = false;
+            marioBody.velocity = new Vector2(0, 50);
+
+            // play game lost sound effect
+            loseAudio.Play();
+
+            resultText.text = "You Lose!";
         }
     }
 }
