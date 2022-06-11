@@ -45,6 +45,9 @@ public class PlayerController : MonoBehaviour {
     // particles
     public ParticleSystem dustCloud;
 
+    // game constants
+    public GameConstants gameConstants;
+
     void Start() {
         Application.targetFrameRate = 60;
 
@@ -53,7 +56,7 @@ public class PlayerController : MonoBehaviour {
         marioAnimator = GetComponent<Animator>();
 
         // retrieve high score from player preferences
-        highScore = PlayerPrefs.GetInt("highScore");
+        highScore = gameConstants.highScore;
         Debug.Log("High Score: " + highScore.ToString());
     }
 
@@ -189,8 +192,7 @@ public class PlayerController : MonoBehaviour {
             if (highScore < score) {
                 highScore = score;
 
-                PlayerPrefs.SetInt("highScore", highScore);
-                PlayerPrefs.Save();
+                gameConstants.highScore = highScore;
 
                 // play high score music
                 loseAudio.Stop();
