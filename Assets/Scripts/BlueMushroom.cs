@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class ConsumableMushroomController : MonoBehaviour {
+public class BlueMushroom : MonoBehaviour, ConsumableInterface {
+    public Texture t;
     private Rigidbody2D mushroomBody;
+    private SpriteRenderer mushroomSprite;
     private Vector2 velocity;
     private int speed = 10;
     private int springSpeed = 10;
@@ -13,6 +15,7 @@ public class ConsumableMushroomController : MonoBehaviour {
 
     void Start() {
         mushroomBody = GetComponent<Rigidbody2D>();
+        mushroomSprite = GetComponent<SpriteRenderer>();
 
         int random = Random.Range(0, 2);
         if (random == 0) moveRight = false;
@@ -37,10 +40,19 @@ public class ConsumableMushroomController : MonoBehaviour {
 
         else if (col.gameObject.CompareTag("Player")) {
             gameObject.SetActive(false);
+            Debug.Log("blue mushroom collected");
+            CentralManager.centralManagerInstance.addPowerup(t, 0, this);
+            GetComponent<Collider2D>().enabled = false;
         }
     }
 
-    void OnBecameInvisible() {
-        Destroy(gameObject);
+    public void consumedBy(GameObject player) {
+        player.GetComponent<PlayerController>().upSpeed += 10;
+        StartCoroutine(removeEffect(player));
+    }
+
+    IEnumerator removeEffect(GameObject player) {
+        yield return new WaitForSeconds(5.0f);
+        player.GetComponent<PlayerController>().upSpeed -= 10;
     }
 }

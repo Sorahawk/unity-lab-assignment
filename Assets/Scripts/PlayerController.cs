@@ -7,13 +7,14 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour {
     private Rigidbody2D marioBody;
     private SpriteRenderer marioSprite;
+    private Collider2D marioCollider;
     private Animator marioAnimator;
 
     // movement
     private Vector2 velocity;
-    private float speed = 100;
-    private float maxSpeed = 150;
-    private float upSpeed = 13;
+    private float speed;
+    public float maxSpeed = 150;
+    public float upSpeed = 13;
 
     private float friction = 0.15f;
     private float airDrag = 0.1f;
@@ -25,13 +26,11 @@ public class PlayerController : MonoBehaviour {
 
     // score
     public Transform enemyLocation;
-    public Text scoreText;
     public Text highScoreText;
     public Text resultText;
     public Button restartButton;
     private bool countScoreState = false;
     private bool gameOver = false;
-    private int score = 0;
     private int highScore;
 
     // audio
@@ -54,10 +53,15 @@ public class PlayerController : MonoBehaviour {
         marioBody = GetComponent<Rigidbody2D>();
         marioSprite = GetComponent<SpriteRenderer>();
         marioAnimator = GetComponent<Animator>();
+        marioCollider = GetComponent<Collider2D>();
+
+        speed = gameConstants.playerSpeed;
 
         // retrieve high score from player preferences
         highScore = gameConstants.highScore;
         Debug.Log("High Score: " + highScore.ToString());
+
+        GameManager.OnPlayerDeath += PlayerDiesSequence;
     }
 
     void Update() {
@@ -70,17 +74,23 @@ public class PlayerController : MonoBehaviour {
             if (Mathf.Abs(marioBody.velocity.x) > 1) marioAnimator.SetTrigger("onSkid");
         }
 
-        else if (Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
+        if (Input.GetKeyDown("right") || Input.GetKeyDown("d")) {
             marioSprite.flipX = false;
 
             if (Mathf.Abs(marioBody.velocity.x) > 1) marioAnimator.SetTrigger("onSkid");
+        }
+
+        if (Input.GetKeyDown("z")) {
+            CentralManager.centralManagerInstance.consumePowerup(KeyCode.Z, this.gameObject);
+        } else if (Input.GetKeyDown("x")) {
+            CentralManager.centralManagerInstance.consumePowerup(KeyCode.X, this.gameObject);
         }
 
         // score counting
         if (!onGround && countScoreState) {
             if (Mathf.Abs(transform.position.x - enemyLocation.position.x) < 0.5f && Mathf.Abs(transform.position.y - enemyLocation.position.y) < 5) {
                 countScoreState = false;
-                score++;
+                CentralManager.centralManagerInstance.increaseScore(1);
             }
         }
     }
@@ -136,7 +146,6 @@ public class PlayerController : MonoBehaviour {
 
             marioAnimator.SetBool("onGround", onGround);
             countScoreState = false;
-            scoreText.text = "Score: " + score.ToString();
         }
 
         else if (col.gameObject.CompareTag("Left Wall")) {
@@ -149,67 +158,6 @@ public class PlayerController : MonoBehaviour {
             onSideWalls = -1;
             marioAnimator.SetBool("onWall", true);
             marioSprite.flipX = true;
-        }
-
-        else if (col.gameObject.CompareTag("Enemy")) {
-            gameOver = true;
-            gameMusic.Stop();
-
-            // slow down end screen
-            Time.timeScale = 0.1f;
-
-            // check direction of collision
-            float collisionDirection = transform.position.y - col.gameObject.transform.position.y;
-
-            Debug.Log("Collision Value: " + collisionDirection.ToString());
-
-            // sideways hit should be about -0.505, stomping on it gave values like -1.21 and -1.46
-            if (collisionDirection < 0.8f) {
-                // player loses, blast Mario off after switching off collisions
-                GetComponent<BoxCollider2D>().enabled = false;
-                marioBody.velocity = new Vector2(0, 50);
-
-                // play game lost sound effect
-                loseAudio.Play();
-
-                resultText.text = "You Lose!";
-            }
-
-            // player wins
-            else {
-                // switch off collision and shoot enemy into the sky
-                col.gameObject.GetComponent<Collider2D>().enabled = false;
-                col.gameObject.GetComponent<Rigidbody2D>().velocity = new Vector2(30, 10);
-
-                // play normal win music
-                winAudio.Play();
-
-                // add bonus points
-                score += 15;
-            }
-
-            // check if new high score
-            if (highScore < score) {
-                highScore = score;
-
-                gameConstants.highScore = highScore;
-
-                // play high score music
-                loseAudio.Stop();
-                winAudio.Stop();
-                highScoreAudio.Play();
-            } else {
-                highScoreText.fontSize = 46;
-                highScoreText.text = "High Score: " + highScore.ToString();
-
-            }
-
-            // display results and reveal start button
-            scoreText.text = "Score: " + score.ToString();
-
-            resultText.gameObject.SetActive(true);
-            highScoreText.gameObject.SetActive(true);
-            restartButton.gameObject.SetActive(true);
         }
     }
 
@@ -248,8 +196,7 @@ public class PlayerController : MonoBehaviour {
             coinAudio.Play();
 
             // add bonus score
-            score += 10;
-            scoreText.text = "Score: " + score.ToString();
+            CentralManager.centralManagerInstance.increaseScore(10);
 
             // remove coin and platform
             other.gameObject.SetActive(false);
@@ -270,5 +217,24 @@ public class PlayerController : MonoBehaviour {
 
             resultText.text = "You Lose!";
         }
+    }
+
+    void PlayerDiesSequence() {
+        gameOver = true;
+        gameMusic.Stop();
+
+        // slow down end screen
+        Time.timeScale = 0.1f;
+
+        marioCollider.enabled = false;
+        marioBody.velocity = new Vector2(0, 50);
+
+        // play game lost sound effect
+        loseAudio.Play();
+
+        resultText.text = "You Die!";
+        resultText.gameObject.SetActive(true);
+        //highScoreText.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(true);
     }
 }

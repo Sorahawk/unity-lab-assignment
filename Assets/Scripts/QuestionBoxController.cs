@@ -17,6 +17,8 @@ public class QuestionBoxController : MonoBehaviour {
             rigidBody.AddForce(new Vector2(0, rigidBody.mass * 20), ForceMode2D.Impulse);
 
             Instantiate(consumablePrefab, new Vector3(this.transform.position.x, this.transform.position.y + 1, this.transform.position.z), Quaternion.identity);
+            SpawnManager.spawnManagerInstance.spawnFromPooler(ObjectType.turtleEnemy);
+            CentralManager.centralManagerInstance.increaseScore(10);
             StartCoroutine(DisableHit());
         }
     }

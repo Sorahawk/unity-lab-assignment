@@ -4,7 +4,10 @@ using UnityEngine;
 
 
 public class SpawnManager : MonoBehaviour {
-    void spawnFromPooler(ObjectType i) {
+    public static SpawnManager spawnManagerInstance;
+    public GameConstants gameConstants;
+
+    public void spawnFromPooler(ObjectType i) {
         GameObject item = ObjectPooler.SharedInstance.GetPooledObject(i);
 
         if (item != null) {
@@ -15,6 +18,8 @@ public class SpawnManager : MonoBehaviour {
 
     void Awake() {
         Debug.Log(ObjectPooler.SharedInstance);
+
+        spawnManagerInstance = this;
         for (int j = 0; j < 2; j++) spawnFromPooler(ObjectType.turtleEnemy);
     }
 }

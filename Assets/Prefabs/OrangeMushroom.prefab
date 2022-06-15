@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 4595414842903783301}
   - component: {fileID: 760695707714236153}
   - component: {fileID: 5637172116535701025}
-  - component: {fileID: -1122481322863745513}
+  - component: {fileID: 3389439329250824736}
   m_Layer: 7
-  m_Name: ConsumableMushroomSimple
+  m_Name: OrangeMushroom
   m_TagString: Mushroom
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300018, guid: cbe738a6b31804fbfa01d65f850d595b, type: 3}
+  m_Sprite: {fileID: 21300014, guid: cbe738a6b31804fbfa01d65f850d595b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -124,7 +124,7 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
---- !u!114 &-1122481322863745513
+--- !u!114 &3389439329250824736
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -136,3 +136,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6ae0d22f666f9b4ea2b3c3bbfd097ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  t: {fileID: 2800000, guid: 1868a4705f8018046bb4398dd0884988, type: 3}

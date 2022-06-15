@@ -12,11 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8de2ad2c12a2604f95d9aa69d605f3f, type: 3}
   m_Name: GameConstants
   m_EditorClassIdentifier: 
-  consumeTimeStep: 10
-  consumeLargestScale: 4
-  breakTimeStep: 30
-  breakDebrisTorque: 10
-  breakDebrisForce: 10
-  spawnNumberOfDebris: 10
-  rotatorRotateSpeed: 6
-  testValue: 0
+  highScore: 0
+  groundSurface: -6
+  playerSpeed: 100
